@@ -45,4 +45,18 @@ public class MainPage {
     public List<WebElement> getFaqItems(){
        return driver.findElements(accordionItem);
     }
+
+    public boolean isButtonClickable(WebElement faqElement) {
+        return faqElement.findElement(accordionButton).isEnabled();
+    }
+
+    public String getQuestion(WebElement faqElement) {
+        return faqElement.findElement(accordionButton).getText();
+    }
+
+    public String getAnswer(WebElement faqElement) {
+        return faqElement.findElement(accordionPanel).getText();
+    }
+
+
 }
