@@ -1,27 +1,24 @@
 package ru.yandex.praktikum.mytest;
 
-import org.junit.*;
+import static org.junit.Assert.assertTrue;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.Augmenter;
 import ru.yandex.praktikum.pom.MainPage;
 import ru.yandex.praktikum.pom.OrderPage;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 @RunWith(Parameterized.class)
 public class OrderTest {
 
-    private WebDriver driver;
-    public MainPage objMainPage;
+    public static WebDriver driver;
+    public static MainPage objMainPage;
     public OrderPage objOrderPage;
-    private final By buttonCheckOrder = By.xpath(".//button[text() = 'Посмотреть статус']");
-
     private final int indexButton;
     private final String name;
     private final String surname;
@@ -48,32 +45,38 @@ public class OrderTest {
     @Parameterized.Parameters
     public static Object[][] getTestData() {
         return new Object[][] {
-                {0, "Аня", "Богданова", "Москва", "Кунцевская", "+7901123456", "10.03.2023", "трое суток", "Проверка 1"},
-                {1, "Ваня", "Богданов", "Москва", "Солнцево", "+790234567", "20.03.2023", "сутки", "Проверка 2"}
+                {0, "Аня", "Богданова", "Москва", "Выставочная", "+7901234567", "10.03.2023", "трое суток", "Проверка 1"},
+                {1, "Ваня", "Богданов", "Москва", "Беговая", "+7902345678", "20.03.2023", "сутки", "Проверка 2"}
         };
     }
 
     @BeforeClass
-    public void initialOrder() {
-
-        driver = new ChromeDriver();
+    public static void initialOrder() {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
         driver = new ChromeDriver(options);
         driver = new Augmenter().augment(driver);
-        driver.get("https://qa-scooter.praktikum-services.ru/");
-        objMainPage = new MainPage(driver);
-        objMainPage.waitForLoadFaq();
-        objOrderPage = new OrderPage(driver);
     }
     @Test
     public void testOrder() {
 
+        driver.get("https://qa-scooter.praktikum-services.ru/");
+        objMainPage = new MainPage(driver);
+        objMainPage.waitForLoadPage();
+        objMainPage.clickGetCookie();
+
+        objMainPage.clickOrder(indexButton);
+        objOrderPage = new OrderPage(driver);
+        objOrderPage.waitForLoadOrderPage();
+        objOrderPage.setDataFieldsAndClickNext(name, surname, address, metro, phone);
+        objOrderPage.setOtherFieldsAndClickOrder(dateOrder, period, comment);
+
+        assertTrue("Отсутствует сообщение об успешном завершении заказа", objMainPage.isElementExist(objOrderPage.orderPlaced));
     }
 
     @AfterClass
-    public void tearDown() {
+    public static void tearDown() {
         if (driver!=null)
             driver.quit();
     }

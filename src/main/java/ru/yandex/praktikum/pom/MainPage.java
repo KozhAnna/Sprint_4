@@ -26,8 +26,9 @@ public class MainPage {
     private By accordionItem = By.className("accordion__item");
     // кнопка с вопросом
     private By accordionButton = By.className("accordion__button");
-    // панель с ответом
-    private By accordionPanel = By.className("accordion__panel");
+    private By accordionPanel = By.className("accordion__panel"); // панель с ответом
+    private By imageScooter = By.xpath(".//img[@alt = 'Scooter blueprint']");
+    private By buttonAcceptCookie = By.id("rcc-confirm-button");
 
     // конструктор класса
     public MainPage(WebDriver driver){
@@ -41,6 +42,19 @@ public class MainPage {
         ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", faqElement);
     }
 
+    public void waitForLoadPage() {
+        WebElement imageElement = driver.findElement(imageScooter);
+        new WebDriverWait(driver, Duration.ofSeconds(3)).until(ExpectedConditions.visibilityOfElementLocated(imageScooter));
+        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", imageElement);
+    }
+    public boolean isElementExist(By locatorBy) {
+        try {
+            driver.findElement(locatorBy);
+            return true;
+        } catch (org.openqa.selenium.NoSuchElementException e) {
+            return false;
+        }
+    }
     // возвращает список всех вопросов-ответов
     public List<WebElement> getFaqItems(){
        return driver.findElements(accordionItem);
@@ -58,5 +72,23 @@ public class MainPage {
         return faqElement.findElement(accordionPanel).getText();
     }
 
+    public void clickOrder(int indexButton) {
+        switch (indexButton) {
+            case 0:
+                driver.findElement(buttonOrderTop).click();
+                break;
+            case 1:
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+                WebElement buttonOrder = driver.findElement(buttonOrderBottom);
+                new WebDriverWait(driver, Duration.ofSeconds(10)).until(driver -> (buttonOrder.isDisplayed()));
+                buttonOrder.click();
+                break;
+        }
+    }
+    public void clickGetCookie() {
+        if (isElementExist(buttonAcceptCookie))
+            driver.findElement(buttonAcceptCookie).click();
+    }
 
 }

@@ -11,10 +11,8 @@ import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import java.util.List; // Импорт для работы с List
-import java.util.concurrent.TimeUnit;
 import static org.hamcrest.CoreMatchers.containsString;
 import org.openqa.selenium.remote.Augmenter;
 

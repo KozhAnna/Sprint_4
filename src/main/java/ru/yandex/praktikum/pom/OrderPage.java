@@ -1,8 +1,12 @@
 package ru.yandex.praktikum.pom;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import java.time.Duration;
 
 public class OrderPage {
 
@@ -19,15 +23,42 @@ public class OrderPage {
     private By inputCalendar = By.xpath("//input[@placeholder ='* Когда привезти самокат']");
     private By inputDate = By.xpath("//div[contains(@class, 'day--today')]");
     private By inputPeriod = By.className("Dropdown-placeholder");
-    private By inputDay = By.xpath(".//div[@class='Dropdown-menu']/div[text()='сутки']");
     private By checkBoxColor = By.id("grey");
     private By InputComment = By.xpath("//input[@placeholder ='Комментарий для курьера']");
-    private By buttonNext = By.cssSelector(".//div[starts-with(@class,'Order_NextButton')]/button");
-    private By buttonOrder = By.xpath(".//div[starts-with(@class,'Order_Buttons')]/button[contains(text(), 'Заказать')]");
+    private By buttonNext = By.xpath(".//div[starts-with(@class,'Order_NextButton')]//button[contains(text(), 'Далее')]");
+    private By buttonOrder = By.xpath(".//div[starts-with(@class,'Order_Buttons')]//button[contains(text(), 'Заказать')]");
     private By buttonYes = By.xpath("//button[contains(text(), 'Да')]");
+    public By orderPlaced = By.xpath("//div[(text()= 'Заказ оформлен')]");
 
     public OrderPage(WebDriver driver) {
         this.driver = driver;
+    }
+
+    public void waitForLoadOrderPage() {
+        //new WebDriverWait(driver, Duration.ofSeconds(10)).until(driver -> (driver.findElement(buttonNext).isDisplayed()));
+        new WebDriverWait(driver, Duration.ofSeconds(3)).until(ExpectedConditions.visibilityOfElementLocated(getTitleOrder()));
+    }
+
+    public void setDataFieldsAndClickNext(String valueName, String valueSurname, String valueAddress,
+                                          String valueMetro, String valuePhone) {
+        getName().sendKeys(valueName);
+        getSurname().sendKeys(valueSurname);
+        getAddress().sendKeys(valueAddress);
+        getMetro().sendKeys(valueMetro, Keys.ARROW_DOWN, Keys.ENTER);
+        getPhoneNumber().sendKeys(valuePhone);
+        getButtonNext().click();
+    }
+
+    public void setOtherFieldsAndClickOrder(String valueDateOrder, String valuePeriod, String valueComment) {
+        //getCalendar().click();
+        getCalendar().sendKeys(valueDateOrder, Keys.ARROW_DOWN, Keys.ENTER);
+        getPeriod().click();
+        getDays(valuePeriod).click();
+        getColor().click();
+        getComment().sendKeys(valueComment);
+        getButtonOrder().click();
+        new WebDriverWait(driver, Duration.ofSeconds(3)).until(driver -> (getButtonYes().isDisplayed()));
+        getButtonYes().click();
     }
 
     public By getTitleOrder() {
@@ -54,7 +85,7 @@ public class OrderPage {
         return driver.findElement(inputPhone);
     }
 
-    public WebElement getStation() {
+    public WebElement getMetro() {
         return driver.findElement(inputMetro);
     }
 
@@ -62,16 +93,12 @@ public class OrderPage {
         return driver.findElement(inputCalendar);
     }
 
-    public WebElement getDate() {
-        return driver.findElement(inputDate);
-    }
-
     public WebElement getPeriod() {
         return driver.findElement(inputPeriod);
     }
 
-    public WebElement getDays() {
-        return driver.findElement(inputDay);
+    public WebElement getDays(String valueDays) {
+        return driver.findElement(By.xpath(".//div[@class='Dropdown-menu']/div[text()='"+valueDays+"']"));
     }
 
     public WebElement getColor() {
