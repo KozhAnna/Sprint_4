@@ -27,10 +27,11 @@ public class OrderTest {
     private final String phone;
     private final String dateOrder;
     private final String period;
+    private final String color;
     private final String comment;
 
     public OrderTest(int indexButton, String name, String surname, String address, String metro,
-                            String phone, String dateOrder, String period, String comment) {
+                            String phone, String dateOrder, String period, String color, String comment) {
         this.indexButton = indexButton;
         this.name = name;
         this.surname = surname;
@@ -39,14 +40,25 @@ public class OrderTest {
         this.phone = phone;
         this.dateOrder = dateOrder;
         this.period = period;
+        this.color = color;
         this.comment = comment;
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "Оформление заказа: " +
+        "Способ вызова: {0}; " +
+        "Имя: {1}; " +
+        "Фамилия: {2}; " +
+        "Адрес: {3}; " +
+        "Метро: {4}; " +
+        "Телефон: {5}; " +
+        "Когда нужен: {6}; " +
+        "Срок аренды: {7}; " +
+        "Цвет: {8}; " +
+        "Комментарий: {9}")
     public static Object[][] getTestData() {
         return new Object[][] {
-                {0, "Аня", "Богданова", "Москва", "Выставочная", "+7901234567", "10.03.2023", "трое суток", "Проверка 1"},
-                {1, "Ваня", "Богданов", "Москва", "Беговая", "+7902345678", "20.03.2023", "сутки", "Проверка 2"}
+                {0, "Аня", "Богданова", "Москва", "Выставочная", "+7901234567", "10.03.2023", "трое суток", "grey", "Проверка 1"},
+                {1, "Ваня", "Богданов", "Москва", "Беговая", "+7902345678", "20.03.2023", "сутки", "black", "Проверка 2"}
         };
     }
 
@@ -58,6 +70,7 @@ public class OrderTest {
         driver = new ChromeDriver(options);
         driver = new Augmenter().augment(driver);
     }
+
     @Test
     public void testOrder() {
 
@@ -70,7 +83,8 @@ public class OrderTest {
         objOrderPage = new OrderPage(driver);
         objOrderPage.waitForLoadOrderPage();
         objOrderPage.setDataFieldsAndClickNext(name, surname, address, metro, phone);
-        objOrderPage.setOtherFieldsAndClickOrder(dateOrder, period, comment);
+        objOrderPage.waitForLoadRentPage();
+        objOrderPage.setOtherFieldsAndClickOrder(dateOrder, period, color, comment);
 
         assertTrue("Отсутствует сообщение об успешном завершении заказа", objMainPage.isElementExist(objOrderPage.orderPlaced));
     }
@@ -80,4 +94,6 @@ public class OrderTest {
         if (driver!=null)
             driver.quit();
     }
+
 }
+
